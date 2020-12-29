@@ -83,8 +83,8 @@ export default {
       ratio: '1.0',
       // 如果首页已加载花型则接收来着首页的花型参数
       imageUrl: "",
-      baseUrl:'http://192.168.1.151:9999/', //线下
-      // baseUrl: 'https://www.yinhuachaoshi.com/order',//线上
+      // baseUrl:'http://192.168.1.151:9999/', //线下
+      baseUrl: 'https://www.yinhuachaoshi.com/order',//线上
     };
   },
   methods: {

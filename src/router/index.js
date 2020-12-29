@@ -64,6 +64,11 @@ export default new Router({
       path:'/messageManage',
       name:'MessageManage',
       component: resolve => (require(['@/views/order/orderManage'],resolve))
+    },
+    {
+      path:'/ceshi',
+      name:'Ceshi',
+      component: resolve => (require(['@/views/order/Ceshi'],resolve))
     }
   ],
   mode:'history'
