@@ -860,10 +860,11 @@
                     <td colspan="3" width="30%">
                       <label
                         style="font-size: 16px"
-                        v-if="printItem.type == '3'"
                         v-for="printItem in detailInfo.orderOperations"
                         :key="printItem.fkUserId"
-                        >{{ printItem.userName }}</label
+                        >{{
+                          printItem.type == "3" ? printItem.userName : ""
+                        }}</label
                       >
                     </td>
                   </tr>
