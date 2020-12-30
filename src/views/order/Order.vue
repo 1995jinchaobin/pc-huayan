@@ -111,7 +111,7 @@
                 </el-switch>
               </div>
             </el-form-item>
-            <!-- <el-form-item label="浆料配方">
+            <el-form-item label="浆料配方">
               <div class="chooseF">
                 <el-select
                   v-model="sizingName"
@@ -127,7 +127,7 @@
                   </el-option>
                 </el-select>
               </div>
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item label="配置方案">
               <div class="chooseF">
                 <el-select
@@ -219,7 +219,7 @@
         </div>
       </div>
     </div>
-    <!-- <div class="copyright">copyright © 2020 华燕数码</div> -->
+    <div class="copyright">copyright © 2020 华燕数码</div>
   </div>
 </template>
 <script>
@@ -272,8 +272,7 @@ export default {
       // 花型路径
       flowerPath: '',
       fileSize: 20,
-      // requestUrl:'http://192.168.0.104:9999',
-      // requestUrl:'http://192.168.1.115:9999',//测试
+      // requestUrl: 'http://192.168.1.115:9999',//测试
       requestUrl: 'https://www.yinhuachaoshi.com/order',//线上
       again: false,
       //0不加急1加急
@@ -281,10 +280,10 @@ export default {
       arrJingxiao: [],
       arrJiagong: [],
       // 浆料配方列表
-      // sizingList: [],
+      sizingList: [],
       //浆料名
-      // sizingName: '',
-      // sizingIndex: ''
+      sizingName: '',
+      sizingIndex: ''
     };
   },
   components: {
@@ -292,6 +291,8 @@ export default {
   },
   methods: {
     onSubmit () {
+      console.log(this.configList)
+      console.log(this.configName)
       //验证
       if (this.fileList.length == 0) {
         this.$message.error("请选择花型");
@@ -349,18 +350,24 @@ export default {
               fabricInfo = item
             }
           })
-          // this.sizingIndex = this.sizingList.findIndex(item => {
-          //   return item.name === this.sizingName
-          // })
-          // let sizingId
-          // let sizingName
-          // if (this.sizingIndex === -1) {
-          //   sizingId = 0
-          //   sizingName = '无浆料配方'
-          // } else {
-          //   sizingId = this.sizingList[this.sizingIndex].id,
-          //     sizingName = this.sizingList[this.sizingIndex].name
-          // }
+          this.sizingIndex = this.sizingList.findIndex(item => {
+            return item.name === this.sizingName
+          })
+          let sizingId
+          let sizingName
+          if (this.sizingIndex === -1) {
+            sizingId = 0
+            sizingName = '无浆料配方'
+          } else {
+            sizingId = this.sizingList[this.sizingIndex].id,
+              sizingName = this.sizingList[this.sizingIndex].name
+          }
+          let machineId
+          this.configList.forEach(item => {
+            if (item.name === this.configName) {
+              machineId = item.machineId
+            }
+          })
           const obj = {
             companyName: customer.companyName,
             fkCustomerId: customer.fkUserId,
@@ -381,17 +388,14 @@ export default {
             colorName: colorDetail.name,
             fkColorId: colorDetail.id,
             expedite: this.expedite,
-            // sizingId: sizingId,
-            // sizingName: sizingName
+            sizingId: sizingId,
+            sizingName: sizingName,
+            machineId
           }
           if (obj.colorName === undefined || obj.fkColorId === undefined) {
             obj.colorName = '无调色员'
             obj.fkColorId = 0
           }
-          //   else if(!this.fkColorAccount){
-          //   // this.$message.error("请选择调色员")
-          //   this.
-          // }
           // console.log(obj)
           this.$post('/order', obj).then((data) => {
             this.$message.success(data.message);
@@ -430,7 +434,7 @@ export default {
     //点击面料来源
     changeOrigin () {
       // console.log('点击')
-      // this.fabricName = ''
+      this.fabricName = ''
     },
     doLogin () {
       return false;
@@ -488,9 +492,9 @@ export default {
         fkCustomerId: id
       }).then((data) => {
         // console.log(data)
-        // if (this.origin === '加工') {
-        this.fabricList = data.data
-        // }
+        if (this.origin === '加工') {
+          this.fabricList = data.data
+        }
         this.arrJiagong = data.data;
       })
     },
@@ -502,7 +506,7 @@ export default {
       }).then((data) => {
         // console.log(data)
         const arrJiagong = []
-        // const arrJingxiao = []
+        const arrJingxiao = []
         const lenth = data.data.list.length
         for (let a = 0; a < lenth; a++) {
           if (data.data.list[a].fkCustomerId !== -10) {
@@ -512,28 +516,28 @@ export default {
         // console.log(arrJiagong)
         // this.fabricName = ''
         this.arrJiagong = arrJiagong
-        // if (this.origin === '加工') {
-        this.fabricList = arrJiagong
-        // }
+        if (this.origin === '加工') {
+          this.fabricList = arrJiagong
+        }
       })
-      // this.$get('/fabric/select', {
-      //   page: 1,
-      //   rows: 999999,
-      //   fkCustomerId: -10
-      // }).then((data) => {
-      //   const arrJingxiao = []
-      //   // console.log(data)
-      //   const lenthA = data.data.length
-      //   for (let a = 0; a < lenthA; a++) {
-      //     arrJingxiao.push(data.data[a])
-      //   }
-      // console.log(arrJingxiao)
-      // this.fabricName = ''
-      //   this.arrJingxiao = arrJingxiao
-      //   if (this.origin === '经销') {
-      //     this.fabricList = arrJingxiao
-      //   }
-      // })
+      this.$get('/fabric/select', {
+        page: 1,
+        rows: 999999,
+        fkCustomerId: -10
+      }).then((data) => {
+        const arrJingxiao = []
+        // console.log(data)
+        const lenthA = data.data.length
+        for (let a = 0; a < lenthA; a++) {
+          arrJingxiao.push(data.data[a])
+        }
+        console.log(arrJingxiao)
+        // this.fabricName = ''
+        this.arrJingxiao = arrJingxiao
+        if (this.origin === '经销') {
+          this.fabricList = arrJingxiao
+        }
+      })
     },
     // 获取配置方案列表
     getConfigList () {
@@ -556,10 +560,10 @@ export default {
     //客户改变
     changeCustomer () {
       // console.log('客户改变')
-      // if (this.origin === '加工') {
-      this.fabricName = ''
-      console.log(this.fkCustomerAccount)
-      // }
+      if (this.origin === '加工') {
+        this.fabricName = ''
+        console.log(this.fkCustomerAccount)
+      }
     }
   },
   mounted () {
@@ -570,7 +574,7 @@ export default {
     this.getCustomerList();
     this.getConfigList();
     this.getFkColorList();
-    // this.getSizingList()
+    this.getSizingList()
     this.getFabricListAll();
     if (this.$route.params) {
       this.fkCustomerAccount = this.$route.params.customerAccount
@@ -578,7 +582,7 @@ export default {
       if (this.$route.params.orderInfo) {
         this.again = true;
         let orderInfo = this.$route.params.orderInfo;
-        // console.log(orderInfo)
+        console.log(orderInfo)
         let customer = {};
         customer.companyName = orderInfo.companyName;
         customer.fkUserId = orderInfo.fkUserId;
@@ -587,14 +591,14 @@ export default {
         customer.address = orderInfo.address;
         this.fkCustomerId = orderInfo.fkCustomerId
         this.fabricName = orderInfo.fabricName;
-        //fabricInfo.id = orderInfo.fkFabricId;
+        // fabricInfo.id = orderInfo.fkFabricId;
         this.meter = parseFloat(orderInfo.meter);
         this.unitPrice = parseFloat(orderInfo.unitPrice);
         this.origin = orderInfo.origin;
         this.remark = orderInfo.note;
         this.deliveryTime = orderInfo.deliveryTime;
         this.deliveryType = orderInfo.deliveryType;
-        // this.sizingName = orderInfo.sizingName
+        this.sizingName = orderInfo.sizingName
         let fileList = [];
         orderInfo.orderDetails.forEach((item, index) => {
           fileList.push({
@@ -643,14 +647,14 @@ export default {
       }
       // console.log('客户选择')
     },
-    // origin () {
-    //   // console.log(this.origin)
-    //   if (this.origin === '加工') {
-    //     this.fabricList = this.arrJiagong
-    //   } else {
-    //     this.fabricList = this.arrJingxiao
-    //   }
-    // }
+    origin () {
+      // console.log(this.origin)
+      if (this.origin === '加工') {
+        this.fabricList = this.arrJiagong
+      } else {
+        this.fabricList = this.arrJingxiao
+      }
+    }
   }
 }
 </script>

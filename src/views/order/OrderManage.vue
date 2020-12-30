@@ -359,7 +359,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col :span="11" :offset="1">
+              <el-col :span="23" :offset="1">
                 <el-form label-width="100px">
                   <el-form-item label="花型:">
                     <el-col
@@ -385,13 +385,13 @@
                   </el-form-item>
                 </el-form>
               </el-col>
-              <el-col :span="12">
+              <!-- <el-col :span="12">
                 <el-form label-width="100px">
                   <el-form-item label="浆料配方:">
                     <label>{{ detailInfo.sizingName }}</label>
                   </el-form-item>
                 </el-form>
-              </el-col>
+              </el-col> -->
             </el-row>
             <el-row>
               <el-col :span="11" :offset="1">
@@ -539,11 +539,20 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-form label-width="100px">
-                <el-form-item label="花型路径:">
-                  <label>{{ detailInfo.filePath }}</label>
-                </el-form-item>
-              </el-form>
+              <el-col :span="11" :offset="1">
+                <el-form label-width="100px">
+                  <el-form-item label="花型路径:">
+                    <label>{{ detailInfo.filePath }}</label>
+                  </el-form-item>
+                </el-form>
+              </el-col>
+              <el-col :span="11" :offset="1">
+                <el-form label-width="100px">
+                  <el-form-item label="浆料配方:">
+                    <label>{{ detailInfo.sizingName }}</label>
+                  </el-form-item>
+                </el-form>
+              </el-col>
             </el-row>
             <el-row>
               <el-col :span="11" :offset="1">
@@ -851,7 +860,9 @@
                   </tr>
                   <tr>
                     <td width="12%">花型路径：</td>
-                    <td colspan="7" width="46%">{{ detailInfo.filePath }}</td>
+                    <td colspan="3" width="46%">{{ detailInfo.filePath }}</td>
+                    <td width="12%">浆料配方：</td>
+                    <td colspan="3" width="30%">{{ detailInfo.sizingName }}</td>
                   </tr>
                   <tr>
                     <td width="12%">配置方案：</td>
@@ -860,8 +871,8 @@
                     <td colspan="3" width="30%">
                       <label
                         style="font-size: 16px"
-                        v-for="printItem in detailInfo.orderOperations"
-                        :key="printItem.fkUserId"
+                        v-for="(printItem, index) in detailInfo.orderOperations"
+                        :key="index"
                         >{{
                           printItem.type == "3" ? printItem.userName : ""
                         }}</label
@@ -915,8 +926,12 @@
                     <td width="12%">蒸花：</td>
                     <td width="15%">{{ detailOperateInfo.flowerUser }}</td>
                     <td width="12%">时间：</td>
-                    <td colspan="5" width="61%">
+                    <td width="19%">
                       {{ detailOperateInfo.flowerTime }}
+                    </td>
+                    <td width="12%">调色员:</td>
+                    <td colspan="3" width="30%">
+                      {{ detailInfo.colorName }}
                     </td>
                   </tr>
                   <tr>
@@ -967,9 +982,11 @@
             </div>
             <el-row>
               <div style="margin: 20px auto; width: 200px">
+                <!-- <el-radio v-model="liuzhuan" label="流转单">流转单</el-radio>
+                <el-radio v-model="liuzhuan" label="仓库单">仓库单</el-radio> -->
                 <el-button
                   type="success"
-                  style="cursor: pointer"
+                  style="cursor: pointer; margin-top: 10px"
                   v-print="'#printArea'"
                   >打印</el-button
                 >
@@ -1033,7 +1050,7 @@ export default {
       },
       detailOperateInfo: {},
       //订单状态数组
-      typeList: ['审核不通过', '待审核', '已审核', '已上浆', '已分配', '已打印', '已蒸花', '已检验', '已发货', '已退货', '已发货审核', '已取消'],
+      typeList: ['审核不通过', '待审核', '已审核', '已上浆', '打印中', '已打印', '已蒸花', '已检验', '发货审核中', '已退货', '', '发货中', '', '', '已发货'],
       //订单类型数组
       type1List: ['全部', '待处理', '已完成'],
       drawerTitle: '新增用户',
@@ -1049,7 +1066,7 @@ export default {
       customerList: [],
       roleTypeList: [],
       baseUrl: '',
-      operateTypeList: ['开单', '审核', '上浆', '分配', '打印', '蒸花水洗定型', '检验', '出库', '退货', '发货审核', '打印确认', '调色'],
+      operateTypeList: ['开单', '审核', '上浆', '分配', '打印', '蒸花水洗定型', '检验', '出库', '退货', '发货审核', '打印确认', '调色', '完成检验', '提交快递单'],
       dialogVisible: false,
       //是否显示订单打印
       orderPrintDialogVisible: false,
@@ -1204,11 +1221,18 @@ export default {
       })
     },
     showPrint (orderInfo) {
+      console.log(orderInfo)
+      orderInfo.orderDetails.map(item => {
+        if (item.flowerNum.indexOf('HY') === 0) {
+          item.flowerNum = item.flowerNum.slice(2)
+        }
+      })
       let printList = [];
       this.detailInfo = orderInfo;
       this.detailOperateInfo = {};
-      this.qrCodeUrl = this.requestUrl + '/qrcode?id=' + orderInfo.id;
-      this.detailInfo.createTime = dateUtil.formatDate(this.detailInfo.createTime, 'YYYY-MM-dd HH:mm');
+      this.qrCodeUrl = 'https://www.yinhuachaoshi.com/qrcode?id=' + orderInfo.id;
+      // this.detailInfo.createTime1 = this.detailInfo.createTime
+      this.detailInfo.createTime = dateUtil.formatDate(this.detailInfo.createTime, 'YYYY-MM-dd HH:mm')
       this.detailInfo.deliveryTime = dateUtil.formatDate(this.detailInfo.deliveryTime, 'YYYY-MM-dd HH:mm');
       for (var i = 0; i < this.detailInfo.orderOperations.length; i++) {
         //开单员
@@ -1222,7 +1246,7 @@ export default {
           //领面料：仓库管理员
           this.detailOperateInfo.getFUser = this.detailInfo.orderOperations[i].userName;
           this.detailOperateInfo.getFTime = dateUtil.formatDate(this.detailInfo.orderOperations[i].createTime, 'YYYY-MM-dd HH:mm');
-        } else if (this.detailInfo.orderOperations[i].type >= '4') {
+        } else if (this.detailInfo.orderOperations[i].type == '10') {
           //打印
           printList.push({
             'printUser': this.detailInfo.orderOperations[i].userName,
@@ -1233,7 +1257,7 @@ export default {
           //蒸花
           this.detailOperateInfo.flowerUser = this.detailInfo.orderOperations[i].userName;
           this.detailOperateInfo.flowerTime = dateUtil.formatDate(this.detailInfo.orderOperations[i].createTime, 'YYYY-MM-dd HH:mm');
-        } else if (this.detailInfo.orderOperations[i].type == '7') {
+        } else if (this.detailInfo.orderOperations[i].type == '13') {
           //出库
           this.detailOperateInfo.outUser = this.detailInfo.orderOperations[i].userName;
           this.detailOperateInfo.outTime = dateUtil.formatDate(this.detailInfo.orderOperations[i].createTime, 'YYYY-MM-dd HH:mm');
